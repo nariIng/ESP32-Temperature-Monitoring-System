@@ -1,11 +1,17 @@
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin-top: 50px;
-  }
-  
-  #time, #temperature, #humidity {
-    font-size: 2em;
-    margin-top: 20px;
-  }
-  
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 50px;
+}
+
+h1 {
+  color: #333;
+}
+
+p {
+  font-size: 1.2em;
+}
+
+#temperature, #humidity, #timestamp {
+  font-weight: bold;
+}
