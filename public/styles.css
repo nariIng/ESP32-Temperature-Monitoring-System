@@ -1,0 +1,11 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  #time, #temperature, #humidity {
+    font-size: 2em;
+    margin-top: 20px;
+  }
+  
