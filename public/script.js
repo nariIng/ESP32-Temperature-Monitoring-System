@@ -1,28 +1,36 @@
 let data = [];
 
 async function fetchData() {
-  const response = await fetch('/api/get-data');
-  const sensorData = await response.json();
+  try {
+    const response = await fetch('/api/get-data');
+    if (response.ok) {
+      const sensorData = await response.json();
 
-  document.getElementById('temperature').textContent = sensorData.temperature;
-  document.getElementById('humidity').textContent = sensorData.humidity;
-  document.getElementById('timestamp').textContent = new Date(sensorData.timestamp).toLocaleString();
+      document.getElementById('temperature').textContent = sensorData.temperature;
+      document.getElementById('humidity').textContent = sensorData.humidity;
+      document.getElementById('timestamp').textContent = new Date(sensorData.timestamp).toLocaleString();
 
-  // Ajouter les nouvelles données au tableau local (pour affichage seulement)
-  data.push({
-    time: new Date(sensorData.timestamp).toLocaleString(),
-    temperature: sensorData.temperature,
-    humidity: sensorData.humidity
-  });
+      // Ajouter les nouvelles données au tableau local (pour affichage seulement)
+      data.push({
+        time: new Date(sensorData.timestamp).toLocaleString(),
+        temperature: sensorData.temperature,
+        humidity: sensorData.humidity
+      });
 
-  updateTable();
+      updateTable();
+    } else {
+      console.error('Failed to fetch data');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
 }
 
 function updateTable() {
   const tbody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
   tbody.innerHTML = '';
 
-  // Limiter l'affichage aux 10 dernières lignes
+  // Limiter l'affichage aux 10 dernières lignes et ajouter un scrollbar si nécessaire
   const displayData = data.slice(-10);
 
   displayData.forEach((entry) => {
@@ -35,6 +43,15 @@ function updateTable() {
     cellTemperature.textContent = entry.temperature;
     cellHumidity.textContent = entry.humidity;
   });
+
+  const tableContainer = document.getElementById('table-container');
+  if (data.length > 10) {
+    tableContainer.style.overflowY = 'scroll';
+    tableContainer.style.height = '200px'; // Ajustez la hauteur selon vos besoins
+  } else {
+    tableContainer.style.overflowY = 'auto';
+    tableContainer.style.height = 'auto';
+  }
 }
 
 function downloadExcel() {
@@ -42,12 +59,16 @@ function downloadExcel() {
 }
 
 async function resetTable() {
-  const response = await fetch('/api/reset-excel', { method: 'POST' });
-  if (response.ok) {
-    data = [];
-    updateTable();
-  } else {
-    console.error('Failed to reset Excel file');
+  try {
+    const response = await fetch('/api/reset-excel', { method: 'POST' });
+    if (response.ok) {
+      data = [];
+      updateTable();
+    } else {
+      console.error('Failed to reset Excel file');
+    }
+  } catch (error) {
+    console.error('Error:', error);
   }
 }
 

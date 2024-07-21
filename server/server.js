@@ -25,10 +25,12 @@ if (!fs.existsSync(excelFilePath)) {
 }
 
 // API pour recevoir les données du capteur
-app.post('/api/get-data', (req, res) => {
+app.post('/api/send-data', (req, res) => {
   const { temperature, humidity, timestamp } = req.body;
 
   if (typeof temperature === 'number' && typeof humidity === 'number' && typeof timestamp === 'string') {
+    console.log(`Received data: Temperature = ${temperature}, Humidity = ${humidity}, Timestamp = ${timestamp}`);
+
     const workbook = XLSX.readFile(excelFilePath);
     const worksheet = workbook.Sheets['Sensor Data'];
 
@@ -38,6 +40,7 @@ app.post('/api/get-data', (req, res) => {
 
     res.sendStatus(200);
   } else {
+    console.error('Invalid data received');
     res.sendStatus(400);
   }
 });
