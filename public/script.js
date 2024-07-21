@@ -1,5 +1,5 @@
 async function fetchData() {
-  const response = await fetch('http://your_server.com/get-data');
+  const response = await fetch('http://https://joely-project.vercel.app/get-data');
   const data = await response.json();
 
   document.getElementById('temperature').textContent = data.temperature;
