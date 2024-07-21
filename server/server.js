@@ -1,53 +1,52 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const fs = require('fs');
-const path = require('path');
 const XLSX = require('xlsx');
+const MemoryFS = require('memory-fs');
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
 
-// Chemin vers le fichier Excel
-const excelFilePath = path.join(__dirname, 'sensor_data.xlsx');
+// Créer un système de fichiers en mémoire
+const mfs = new MemoryFS();
+const excelFilePath = '/sensor_data.xlsx';
 
 // Fonction pour créer un nouveau fichier Excel
 function createNewExcelFile() {
   const workbook = XLSX.utils.book_new();
   const worksheet = XLSX.utils.aoa_to_sheet([["Time", "Temperature (°C)", "Humidity (%)"]]);
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Sensor Data');
-  XLSX.writeFile(workbook, excelFilePath);
+  const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+  mfs.writeFileSync(excelFilePath, buffer);
 }
 
-// Créer un nouveau fichier Excel au démarrage du serveur s'il n'existe pas
-if (!fs.existsSync(excelFilePath)) {
-  createNewExcelFile();
-}
+// Créer un nouveau fichier Excel au démarrage du serveur
+createNewExcelFile();
 
 // API pour recevoir les données du capteur
 app.post('/api/send-data', (req, res) => {
   const { temperature, humidity, timestamp } = req.body;
 
   if (typeof temperature === 'number' && typeof humidity === 'number' && typeof timestamp === 'string') {
-    console.log(`Received data: Temperature = ${temperature}, Humidity = ${humidity}, Timestamp = ${timestamp}`);
-
-    const workbook = XLSX.readFile(excelFilePath);
+    const workbook = XLSX.read(mfs.readFileSync(excelFilePath), { type: 'buffer' });
     const worksheet = workbook.Sheets['Sensor Data'];
 
     const newRow = [new Date(parseInt(timestamp)).toLocaleString(), temperature, humidity];
     XLSX.utils.sheet_add_aoa(worksheet, [newRow], { origin: -1 });
-    XLSX.writeFile(workbook, excelFilePath);
+    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+    mfs.writeFileSync(excelFilePath, buffer);
 
     res.sendStatus(200);
   } else {
-    console.error('Invalid data received');
     res.sendStatus(400);
   }
 });
 
 // API pour télécharger le fichier Excel
 app.get('/api/download-excel', (req, res) => {
-  res.download(excelFilePath);
+  res.setHeader('Content-Disposition', 'attachment; filename="sensor_data.xlsx"');
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.send(mfs.readFileSync(excelFilePath));
 });
 
 // API pour réinitialiser le fichier Excel
