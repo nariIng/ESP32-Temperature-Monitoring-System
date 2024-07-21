@@ -11,7 +11,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 let sensorData = {};
 
-app.post('/post-data', (req, res) => {
+app.post('/api/post-data', (req, res) => {
   sensorData = {
     temperature: req.body.temperature,
     humidity: req.body.humidity,
@@ -20,7 +20,7 @@ app.post('/post-data', (req, res) => {
   res.send('Data received');
 });
 
-app.get('/get-data', (req, res) => {
+app.get('/api/get-data', (req, res) => {
   res.json(sensorData);
 });
 
