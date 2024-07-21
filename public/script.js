@@ -7,6 +7,6 @@ async function fetchData() {
   document.getElementById('timestamp').textContent = new Date(data.timestamp).toLocaleString();
 }
 
-setInterval(fetchData, 60000); // Mettre à jour toutes les minutes
+setInterval(fetchData, 2000); // Mettre à jour toutes les minutes
 fetchData();
 
