@@ -8,6 +8,7 @@ async function fetchData() {
   document.getElementById('humidity').textContent = sensorData.humidity;
   document.getElementById('timestamp').textContent = new Date(sensorData.timestamp).toLocaleString();
 
+  // Ajouter les nouvelles données au tableau
   data.push({
     time: new Date(sensorData.timestamp).toLocaleString(),
     temperature: sensorData.temperature,
@@ -21,6 +22,7 @@ function updateTable() {
   const tbody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
   tbody.innerHTML = '';
 
+  // Limiter l'affichage aux 10 dernières lignes
   const displayData = data.slice(-10);
 
   displayData.forEach((entry) => {
@@ -36,32 +38,31 @@ function updateTable() {
 }
 
 function downloadExcel() {
-  fetch('/api/download')
-    .then(response => response.blob())
-    .then(blob => {
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "sensor_data.xlsx";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    })
-    .catch(err => console.error('Error downloading file:', err));
+  const worksheet = XLSX.utils.json_to_sheet(data, { header: ["time", "temperature", "humidity"] });
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sensor Data");
+
+  // Définir les noms des colonnes
+  XLSX.utils.sheet_add_aoa(worksheet, [["Time", "Temperature (°C)", "Humidity (%)"]], { origin: "A1" });
+
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "sensor_data.xlsx";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 function resetTable() {
-  fetch('/api/reset', { method: 'POST' })
-    .then(response => response.text())
-    .then(message => {
-      console.log(message);
-      data = [];
-      updateTable();
-    })
-    .catch(err => console.error('Error resetting data:', err));
+  data = [];
+  updateTable();
 }
 
 document.getElementById('download').addEventListener('click', downloadExcel);
 document.getElementById('reset').addEventListener('click', resetTable);
 
-setInterval(fetchData, 2000); // Mettre à jour toutes les minutes
+setInterval(fetchData, 60000); // Mettre à jour toutes les minutes
 fetchData();
