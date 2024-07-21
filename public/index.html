@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ESP32 DHT11 Data</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <h1>ESP32 DHT11 Data</h1>
@@ -14,9 +15,26 @@
     <p>Timestamp: <span id="timestamp">Loading...</span></p>
   </div>
 
+  <button id="download">Download Excel</button>
+  <button id="reset">Reset Table</button>
+
+  <div id="table-container">
+    <table id="data-table" border="1">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Temperature (°C)</th>
+          <th>Humidity (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
   <script src="script.js"></script>
 </body>
-<footer>
-  copiright by Narindra
+<footer id="foot">
+  copyright by Narindra
 </footer>
 </html>

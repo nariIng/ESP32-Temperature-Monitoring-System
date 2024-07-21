@@ -15,3 +15,25 @@ p {
 #temperature, #humidity, #timestamp {
   font-weight: bold;
 }
+
+#table-container {
+  max-height: 300px; /* Ajustez cette valeur en fonction de vos besoins */
+  overflow-y: auto;
+  margin: 20px auto;
+  width: 80%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+footer {
+  justify-content:end;
+  text-align: center;
+}
