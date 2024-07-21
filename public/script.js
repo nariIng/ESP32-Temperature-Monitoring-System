@@ -8,7 +8,7 @@ async function fetchData() {
   document.getElementById('humidity').textContent = sensorData.humidity;
   document.getElementById('timestamp').textContent = new Date(sensorData.timestamp).toLocaleString();
 
-  // Ajouter les nouvelles données au tableau
+  // Ajouter les nouvelles données au tableau local (pour affichage seulement)
   data.push({
     time: new Date(sensorData.timestamp).toLocaleString(),
     temperature: sensorData.temperature,
@@ -38,27 +38,17 @@ function updateTable() {
 }
 
 function downloadExcel() {
-  const worksheet = XLSX.utils.json_to_sheet(data, { header: ["time", "temperature", "humidity"] });
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Sensor Data");
-
-  // Définir les noms des colonnes
-  XLSX.utils.sheet_add_aoa(worksheet, [["Time", "Temperature (°C)", "Humidity (%)"]], { origin: "A1" });
-
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "sensor_data.xlsx";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  window.location.href = '/api/download-excel';
 }
 
-function resetTable() {
-  data = [];
-  updateTable();
+async function resetTable() {
+  const response = await fetch('/api/reset-excel', { method: 'POST' });
+  if (response.ok) {
+    data = [];
+    updateTable();
+  } else {
+    console.error('Failed to reset Excel file');
+  }
 }
 
 document.getElementById('download').addEventListener('click', downloadExcel);
