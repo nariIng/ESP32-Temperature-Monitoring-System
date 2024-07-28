@@ -67,7 +67,7 @@ function downloadExcel() {
   // Définir les noms des colonnes
   XLSX.utils.sheet_add_aoa(worksheet, [["Time", "Humidity (%)", "Temperature (°C)", "Temperature_1 (°C)", 
                                         "Temperature_2 (°C)", "Temperature_3 (°C)", , "Temperature_4 (°C)", 
-                                        "Temperature_5 (°C)"]], { origin: "A1" });
+                                        "Temperature_5 (°C)"]], { origin: "A7" });
 
   const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
   const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
