@@ -54,21 +54,20 @@ function updateTable() {
     cellTemperature_2.textContent = entry.temperature_2;
     cellTemperature_3.textContent = entry.temperature_3;
     cellTemperature_4.textContent = entry.temperature_4;
-    cellTemperature_5.textContent = entry.temperature_5;
-
+    cellTemperature_5.textContent = entry.temperature_5
   });
 }
 
 function downloadExcel() {
-  const worksheet = XLSX.utils.json_to_sheet(data, { header: ["time", "humidity",  "temperature", "temperature_1" ,"temperature_2", 
+  const worksheet = XLSX.utils.json_to_sheet(data, { header: ["time", "humidity", "temperature", "temperature_1" ,"temperature_2", 
                                                               "temperature_3", "temperature_4", "temperature_5"] });
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sensor Data");
 
   // Définir les noms des colonnes
   XLSX.utils.sheet_add_aoa(worksheet, [["Time", "Humidity (%)", "Temperature (°C)", "Temperature_1 (°C)", 
-                                        , "Temperature_2 (°C)", "Temperature_3 (°C)", , "Temperature_4 (°C)", 
-                                        , "Temperature_5 (°C)"]], { origin: "A1" });
+                                        "Temperature_2 (°C)", "Temperature_3 (°C)", , "Temperature_4 (°C)", 
+                                        "Temperature_5 (°C)"]], { origin: "A1" });
 
   const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
   const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
