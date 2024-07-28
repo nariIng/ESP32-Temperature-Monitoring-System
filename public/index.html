@@ -10,9 +10,15 @@
 <body>
   <h1>ESP32 DHT11 Data</h1>
   <div>
-    <p>Temperature: <span id="temperature">Loading...</span> °C</p>
-    <p>Humidity: <span id="humidity">Loading...</span> %</p>
     <p>Timestamp: <span id="timestamp">Loading...</span></p>
+    <p>Humidity: <span id="humidity">Loading...</span> %</p>
+    <p>Temperature: <span id="temperature">Loading...</span> °C</p>
+    <p>Temperature_1: <span id="temperature_1">Loading...</span> °C</p>
+    <p>Temperature_2: <span id="temperature_2">Loading...</span> °C</p>
+    <p>Temperature_3: <span id="temperature_3">Loading...</span> °C</p>
+    <p>Temperature_4: <span id="temperature_4">Loading...</span> °C</p>
+    <p>Temperature_5: <span id="temperature_5">Loading...</span> °C</p>
+
   </div>
 
   <button id="download">Download Excel</button>
@@ -23,8 +29,13 @@
       <thead>
         <tr>
           <th>Time</th>
-          <th>Temperature (°C)</th>
           <th>Humidity (%)</th>
+          <th>Temperature (°C)</th>
+          <th>Temperature_1 (°C)</th>
+          <th>Temperature_2 (°C)</th>
+          <th>Temperature_3 (°C)</th>
+          <th>Temperature_4 (°C)</th>
+          <th>Temperature_5 (°C)</th>
         </tr>
       </thead>
       <tbody>
