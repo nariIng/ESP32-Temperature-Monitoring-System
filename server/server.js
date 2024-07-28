@@ -13,9 +13,14 @@ let sensorData = {};
 
 app.post('/api/post-data', (req, res) => {
   sensorData = {
-    temperature: req.body.temperature,
+    timestamp: new Date(),
     humidity: req.body.humidity,
-    timestamp: new Date()
+    temperature: req.body.temperature,
+    temperature_1: req.body.temperature_1,
+    temperature_2: req.body.temperature_2,
+    temperature_3: req.body.temperature_3,
+    temperature_4: req.body.temperature_4,
+    temperature_5: req.body.temperature_5
   };
   res.send('Data received');
 });
