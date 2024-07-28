@@ -49,6 +49,7 @@ function updateTable() {
 
     cellTime.textContent = entry.time;
     cellHumidity.textContent = entry.humidity;
+    cellTemperature.textContent = entry.temperature;
     cellTemperature_1.textContent = entry.temperature_1;
     cellTemperature_2.textContent = entry.temperature_2;
     cellTemperature_3.textContent = entry.temperature_3;
