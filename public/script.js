@@ -5,8 +5,6 @@ async function fetchData() {
   const sensorData = await response.json();
 
   document.getElementById('timestamp').textContent = new Date(sensorData.timestamp).toLocaleString();
-  document.getElementById('humidity').textContent = sensorData.humidity;
-  document.getElementById('temperature').textContent = sensorData.temperature;
   document.getElementById('temperature_1').textContent = sensorData.temperature_1;
   document.getElementById('temperature_2').textContent = sensorData.temperature_2;
   document.getElementById('temperature_3').textContent = sensorData.temperature_3;
@@ -39,13 +37,11 @@ function updateTable() {
   displayData.forEach((entry) => {
     const row = tbody.insertRow();
     const cellTime = row.insertCell(0);
-    const cellHumidity = row.insertCell(1);
-    const cellTemperature = row.insertCell(2);
-    const cellTemperature_1 = row.insertCell(3);
-    const cellTemperature_2 = row.insertCell(4);
-    const cellTemperature_3 = row.insertCell(5);
-    const cellTemperature_4 = row.insertCell(6);
-    const cellTemperature_5 = row.insertCell(7);
+    const cellTemperature_1 = row.insertCell(1);
+    const cellTemperature_2 = row.insertCell(2);
+    const cellTemperature_3 = row.insertCell(3);
+    const cellTemperature_4 = row.insertCell(4);
+    const cellTemperature_5 = row.insertCell(5);
 
     cellTime.textContent = entry.time;
     cellHumidity.textContent = entry.humidity;
@@ -65,9 +61,9 @@ function downloadExcel() {
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sensor Data");
 
   // Définir les noms des colonnes
-  XLSX.utils.sheet_add_aoa(worksheet, [["Time", "Humidity (%)", "Temperature (°C)", "Temperature_1 (°C)", 
-                                        "Temperature_2 (°C)", "Temperature_3 (°C)", , "Temperature_4 (°C)", 
-                                        "Temperature_5 (°C)"]], { origin: "A7" });
+  XLSX.utils.sheet_add_aoa(worksheet, [["Temperature_1 (°C)", "Temperature_2 (°C)", "Temperature_3 (°C)",
+                                        "Temperature_4 (°C)", "Temperature_5 (°C)"]], { origin: "A1" },{ origin: "A2" },
+                                        { origin: "A3" }, { origin: "A4" }, { origin: "A5" });
 
   const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
   const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
