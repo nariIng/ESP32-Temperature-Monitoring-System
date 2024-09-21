@@ -54,6 +54,7 @@ function updateTable() {
   });
 }
 
+
 function downloadExcel() {
   const worksheet = XLSX.utils.json_to_sheet(data, { header: ["time", "humidity", "temperature", "temperature_1" ,"temperature_2", 
                                                               "temperature_3", "temperature_4", "temperature_5"] });
