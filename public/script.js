@@ -62,8 +62,7 @@ function downloadExcel() {
 
   // Définir les noms des colonnes
   XLSX.utils.sheet_add_aoa(worksheet, [["Temperature_1 (°C)", "Temperature_2 (°C)", "Temperature_3 (°C)",
-                                        "Temperature_4 (°C)", "Temperature_5 (°C)"]], { origin: "A1" },{ origin: "A2" },
-                                        { origin: "A3" }, { origin: "A4" }, { origin: "A5" });
+                                        "Temperature_4 (°C)", "Temperature_5 (°C)"]], { origin: "A1" });
 
   const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
   const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
