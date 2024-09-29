@@ -80,6 +80,12 @@ function resetTable() {
   updateTable();
 }
 
+const hamburger = document.querySelector("#toggle-btn");
+
+hamburger.addEventListener("click", function(){
+    document.querySelector("#sidebar").classList.toggle("expand");
+})
+
 document.getElementById('download').addEventListener('click', downloadExcel);
 document.getElementById('reset').addEventListener('click', resetTable);
 
