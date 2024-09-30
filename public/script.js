@@ -34,3 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(fetchData, 5000);
 });
 
+
+const hamburger = document.querySelector("#toggle-btn");
+
+hamburger.addEventListener("click", function(){
+    document.querySelector("#sidebar").classList.toggle("expand");
+})
