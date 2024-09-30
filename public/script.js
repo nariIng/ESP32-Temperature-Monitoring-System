@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Fonction pour récupérer les données et mettre à jour le tableau
   function fetchData() {
-    fetch('../api/get-data')
+    fetch('/api/get-data')
       .then(response => response.json())
       .then(data => {
         sensorTableBody.innerHTML = ''; // Vider le tableau
@@ -34,12 +34,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Fonction pour télécharger les données en Excel
   downloadBtn.addEventListener('click', function() {
-    window.location.href = '../api/download-excel';
+    window.location.href = '/api/download-excel';
   });
 
   // Fonction pour réinitialiser la base de données
   resetBtn.addEventListener('click', function() {
-    fetch('../api/reset-data', { method: 'POST' })
+    fetch('/api/reset-data', { method: 'POST' })
       .then(response => response.json())
       .then(message => {
         alert(message.message);
