@@ -67,4 +67,3 @@ document.getElementById('download').addEventListener('click', downloadExcel);
 document.getElementById('reset').addEventListener('click', resetTable);
 
 setInterval(fetchData, 2000); // Mettre à jour toutes les minutes
-fetchData();
