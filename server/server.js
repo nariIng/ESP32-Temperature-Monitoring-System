@@ -9,20 +9,13 @@ app.use(bodyParser.json());
 // Pour servir les fichiers statiques (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, '../public')));
 
-let sensorData = {};
+let sensorData = [];
 
 app.post('/api/post-data', (req, res) => {
-  sensorData = {
-    timestamp: new Date(),
-    humidity: req.body.humidity,
-    temperature: req.body.temperature,
-    temperature_1: req.body.temperature_1,
-    temperature_2: req.body.temperature_2,
-    temperature_3: req.body.temperature_3,
-    temperature_4: req.body.temperature_4,
-    temperature_5: req.body.temperature_5
-  };
-  res.send('Data received');
+  const { time, T_1, T_2, T_3, T_4, T_5 } = req.body;
+  sensorData.push({ time, T_1, T_2, T_3, T_4, T_5 });
+  console.log('Data received:', req.body);
+  res.send('Data received successfully');
 });
 
 app.get('/api/get-data', (req, res) => {

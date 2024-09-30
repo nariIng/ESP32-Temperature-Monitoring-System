@@ -1,58 +1,35 @@
 let data = [];
 
-async function fetchData() {
-  const response = await fetch('/api/get-data');
-  const sensorData = await response.json();
+document.addEventListener('DOMContentLoaded', function() {
+  const sensorTableBody = document.querySelector('#sensorTable tbody');
 
-  document.getElementById('timestamp').textContent = new Date(sensorData.timestamp).toLocaleString();
-  document.getElementById('temperature_1').textContent = sensorData.temperature_1;
-  document.getElementById('temperature_2').textContent = sensorData.temperature_2;
-  document.getElementById('temperature_3').textContent = sensorData.temperature_3;
-  document.getElementById('temperature_4').textContent = sensorData.temperature_4;
-  document.getElementById('temperature_5').textContent = sensorData.temperature_5;
+  // Fonction pour récupérer les données et mettre à jour le tableau
+  function fetchData() {
+    fetch('/api/get-data')
+      .then(response => response.json())
+      .then(data => {
+        sensorTableBody.innerHTML = ''; // Vider le tableau
+
+        // Ajouter une nouvelle ligne pour chaque jeu de données
+        data.forEach(entry => {
+          const row = document.createElement('tr');
+
+          row.innerHTML = `
+            <td>${entry.time}</td>
+            <td>${entry.T_1}</td>
+            <td>${entry.T_2}</td>
+            <td>${entry.T_3}</td>
+            <td>${entry.T_4}</td>
+            <td>${entry.T_5}</td>
+          `;
+
+          sensorTableBody.appendChild(row);
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  }
 
 
-  // Ajouter les nouvelles données au tableau
-  data.push({
-    time: new Date(sensorData.timestamp).toLocaleString(),
-    humidity: sensorData.humidity,
-    temperature: sensorData.temperature,
-    temperature_1: sensorData.temperature_1,
-    temperature_2: sensorData.temperature_2,
-    temperature_3: sensorData.temperature_3,
-    temperature_4: sensorData.temperature_4,
-    temperature_5: sensorData.temperature_5,
-  });
-
-  updateTable();
-}
-
-function updateTable() {
-  const tbody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-  tbody.innerHTML = '';
-
-  // Limiter l'affichage aux 10 dernières lignes
-  const displayData = data.slice(-10);
-
-  displayData.forEach((entry) => {
-    const row = tbody.insertRow();
-    const cellTime = row.insertCell(0);
-    const cellTemperature_1 = row.insertCell(1);
-    const cellTemperature_2 = row.insertCell(2);
-    const cellTemperature_3 = row.insertCell(3);
-    const cellTemperature_4 = row.insertCell(4);
-    const cellTemperature_5 = row.insertCell(5);
-
-    cellTime.textContent = entry.time;
-    cellHumidity.textContent = entry.humidity;
-    cellTemperature.textContent = entry.temperature;
-    cellTemperature_1.textContent = entry.temperature_1;
-    cellTemperature_2.textContent = entry.temperature_2;
-    cellTemperature_3.textContent = entry.temperature_3;
-    cellTemperature_4.textContent = entry.temperature_4;
-    cellTemperature_5.textContent = entry.temperature_5
-  });
-}
 
 function downloadExcel() {
   const worksheet = XLSX.utils.json_to_sheet(data, { header: ["time", "humidity", "temperature", "temperature_1" ,"temperature_2", 
