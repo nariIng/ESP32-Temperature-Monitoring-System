@@ -8,8 +8,11 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(data => {
         sensorTableBody.innerHTML = ''; // Vider le tableau
 
+        // Limiter les données aux 10 dernières entrées
+        const last10Entries = data.slice(-10);
+
         // Ajouter une nouvelle ligne pour chaque jeu de données
-        data.forEach(entry => {
+        last10Entries.forEach(entry => {
           const row = document.createElement('tr');
 
           row.innerHTML = `
