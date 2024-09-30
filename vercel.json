@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/api/post-data", "destination": "/api/post-data" },
-    { "source": "/api/get-data", "destination": "/api/get-data" },
-    { "source": "/api/download-excel", "destination": "/api/download-excel" },
-    { "source": "/api/reset-data", "destination": "/api/reset-data" }
-  ]
-}
