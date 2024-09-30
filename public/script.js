@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Fonction pour récupérer les données et mettre à jour le tableau
   function fetchData() {
-    fetch('../api/get-data')
+    fetch('/api/get-data')
       .then(response => response.json())
       .then(data => {
         sensorTableBody.innerHTML = ''; // Vider le tableau
