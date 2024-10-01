@@ -14,7 +14,13 @@ document.addEventListener('DOMContentLoaded', function() {
           // Ajouter une nouvelle ligne pour chaque jeu de données
           last10Entries.forEach(entry => {
             const row = document.createElement('tr');
+            document.getElementById("time").textContent= entry.time;
             document.getElementById("temperature_1").textContent= entry.T_1;
+            document.getElementById("temperature_2").textContent= entry.T_2;
+            document.getElementById("temperature_3").textContent= entry.T_3;
+            document.getElementById("temperature_4").textContent= entry.T_4;
+            document.getElementById("temperature_5").textContent= entry.T_5;
+
 
             row.innerHTML = `
               <td>${entry.time}</td>
