@@ -56,7 +56,7 @@ app.get('/api/download-csv', async (req, res) => {
       res.download(tempFilePath, 'test.csv', (err) => {
         if (err) {
           console.error('Error downloading CSV:', err);
-          res.status(500).send('Error downloading CSV file');
+          return res.status(500).send('Error downloading CSV file');
         }
 
         // Supprimer le fichier temporaire après le téléchargement
@@ -94,8 +94,9 @@ app.get('/api/reset-data', async (req, res) => {
 
 // Démarrer le serveur
 app.listen(port, () => {
-  console.log(`Server running at https://joely-project.vercel.app/${port}`);
+  console.log(`Server running at http://localhost:${port}`); // Changez à localhost pour le développement local
 });
+
 
 
 
