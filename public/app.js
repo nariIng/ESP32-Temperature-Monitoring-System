@@ -63,3 +63,8 @@ async function fetchData() {
   // Rafraîchir les données toutes les minutes
   setInterval(fetchData, 3000);
   
+const hamburger = document.querySelector("#toggle-btn");
+
+hamburger.addEventListener("click", function(){
+    document.querySelector("#sidebar").classList.toggle("expand");
+})

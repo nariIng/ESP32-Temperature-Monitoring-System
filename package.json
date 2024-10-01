@@ -4,7 +4,7 @@
     "description": "Une application web en temps réel pour afficher les données des capteurs de température d'un ESP32.",
     "main": "server.js",
     "scripts": {
-        "start": "node server.js"
+        "start": "node server/server.js"
     },
     "dependencies": {
         "axios": "^1.0.0",
