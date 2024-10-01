@@ -1,67 +1,86 @@
-// Mise à jour du tableau des températures
-async function fetchData() {
-    const response = await fetch('/data');
-    const data = await response.json();
-    const tableBody = document.querySelector('#temperatureTable tbody');
-    tableBody.innerHTML = '';
-  
-    data.forEach((entry) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${entry.time}</td>
-                       <td>${entry.T_1}</td>
-                       <td>${entry.T_2}</td>
-                       <td>${entry.T_3}</td>
-                       <td>${entry.T_4}</td>
-                       <td>${entry.T_5}</td>`;
-      tableBody.appendChild(row);
-    });
-  }
-  
-  // Télécharger le CSV
-  document.getElementById('downloadBtn').addEventListener('click', () => {
-    window.location.href = '/download';
-  });
-  
-  // Réinitialiser les valeurs
-  document.getElementById('resetBtn').addEventListener('click', async () => {
-    await fetch('/reset', { method: 'POST' });
-    alert('Données réinitialisées');
-  });
-  
-  // Configuration du graphe en temps réel
-  const ctx = document.getElementById('temperatureChart').getContext('2d');
-  const chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: [], // Temps
-      datasets: [
-        { label: 'Capteur 1', data: [] },
-        { label: 'Capteur 2', data: [] },
-        { label: 'Capteur 3', data: [] },
-        { label: 'Capteur 4', data: [] },
-        { label: 'Capteur 5', data: [] }
-      ]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: { type: 'time' },
-        y: { beginAtZero: true }
-      }
+// Importer Chart.js et l'adaptateur Luxon pour la gestion des dates
+import 'chartjs-adapter-luxon';
+import { DateTime } from 'luxon';
+
+// Fonction pour récupérer les données depuis l'API de l'ESP32
+async function fetchTemperatureData() {
+    try {
+        const response = await axios.get('/get-latest-temperatures');
+        return response.data; // Doit retourner un tableau de données avec timestamp et température
+    } catch (error) {
+        console.error('Erreur lors de la récupération des données :', error);
+        return [];
     }
-  });
-  
-  // Mise à jour du graphe en temps réel via WebSocket
-  const socket = io();
-  socket.on('temperatureUpdate', (data) => {
-    data.forEach((entry, index) => {
-      chart.data.datasets[index].data.push({ x: entry.time, y: entry.value });
+}
+
+// Fonction pour créer un nouveau graphique avec les données
+function createChart(data) {
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    // Créer le graphique avec Chart.js
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Température',
+                data: data.map(item => ({
+                    x: DateTime.fromISO(item.time).toISO(),  // Convertir le timestamp au format ISO avec luxon
+                    y: item.temperature // Valeur de température
+                })),
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'minute',  // Unité de temps (minute, seconde, etc.)
+                        tooltipFormat: 'TT', // Format d'affichage des dates dans le tooltip
+                    },
+                    title: {
+                        display: true,
+                        text: 'Temps'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Température (°C)'
+                    }
+                }
+            }
+        }
     });
+}
+
+// Fonction pour mettre à jour le graphique en temps réel
+async function updateChart(chart) {
+    const newData = await fetchTemperatureData();
+    chart.data.datasets[0].data = newData.map(item => ({
+        x: DateTime.fromISO(item.time).toISO(),  // Convertir le timestamp au format ISO
+        y: item.temperature // Valeur de température
+    }));
     chart.update();
-  });
-  
-  // Rafraîchir les données toutes les minutes
-  setInterval(fetchData, 3000);
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', async () => {
+    // Récupérer les 10 dernières valeurs à l'initialisation
+    const initialData = await fetchTemperatureData();
+    
+    // Créer le graphique
+    const myChart = createChart(initialData);
+
+    // Mettre à jour le graphique toutes les 2 secondes (données en temps réel)
+    setInterval(() => {
+        updateChart(myChart);
+    }, 2000);
+});
+
   
   const hamburger = document.querySelector("#toggle-btn");
 
