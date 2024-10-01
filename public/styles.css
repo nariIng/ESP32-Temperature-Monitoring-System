@@ -20,7 +20,7 @@ body {
 }
 
 .wrapper {
-	display: flex;
+	display:flex;
 }
 
 canvas {
