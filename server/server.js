@@ -1,63 +1,37 @@
 const express = require('express');
-const axios = require('axios');
-const fs = require('fs');
+const bodyParser = require('body-parser');
 const path = require('path');
-const socketIO = require('socket.io');
+
 const app = express();
 const port = 3000;
 
-// Middleware pour servir les fichiers statiques
-app.use(express.static('public'));
+let sensorData = [];
 
-// Endpoint pour récupérer les 10 dernières valeurs depuis le serveur ESP32
-app.get('/data', async (req, res) => {
-  try {
-    // URL de l'API qui reçoit les données de l'ESP32
-    const response = await axios.get('https://joely-project.vercel.app/api/get-latest-data');
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).send('Erreur lors de la récupération des données');
-  }
+// Middleware pour analyser les requêtes POST
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// Servir les fichiers statiques (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Route pour recevoir les données de l'ESP32
+app.post('/api/post-data', (req, res) => {
+  const { time, T_1, T_2, T_3, T_4, T_5 } = req.body;
+  sensorData.push({ time, T_1, T_2, T_3, T_4, T_5 });
+  console.log('Data received:', req.body);
+  res.send('Data received successfully');
 });
 
-// Endpoint pour télécharger le fichier CSV depuis la carte SD de l'ESP32
-app.get('/download', (req, res) => {
-  const file = path.join(__dirname, '../path_to_local_file/test.csv');
-  res.download(file, 'temperatures.xlsx');
+// Route pour obtenir les données sous forme JSON pour le client
+app.get('/api/get-data', (req, res) => {
+  res.json(sensorData);
 });
 
-// Endpoint pour réinitialiser les valeurs dans la carte SD via l'ESP32
-app.post('/reset', async (req, res) => {
-  try {
-    // URL de réinitialisation sur l'ESP32
-    await axios.post('https://joely-project.vercel.app/api/reset-data');
-    res.send('Réinitialisation réussie');
-  } catch (error) {
-    res.status(500).send('Erreur lors de la réinitialisation des données');
-  }
+// Démarrer le serveur
+app.listen(port, () => {
+  console.log(`Server running at http://joely_project.vercel.app:${port}`);
 });
 
-// Lancement du serveur
-const server = app.listen(port, () => {
-  console.log(`Serveur lancé sur le port ${port}`);
-});
 
-// WebSocket pour les mises à jour en temps réel
-const io = socketIO(server);
-io.on('connection', (socket) => {
-  console.log('Un client est connecté');
-
-  // Simuler l'envoi de données de capteurs toutes les 5 secondes
-  setInterval(() => {
-    const sampleData = [
-      { time: new Date().toISOString(), value: Math.random() * 30 },
-      { time: new Date().toISOString(), value: Math.random() * 30 },
-      { time: new Date().toISOString(), value: Math.random() * 30 },
-      { time: new Date().toISOString(), value: Math.random() * 30 },
-      { time: new Date().toISOString(), value: Math.random() * 30 }
-    ];
-    socket.emit('temperatureUpdate', sampleData);
-  }, 5000); // Met à jour toutes les 5 secondes
-});
 
 
