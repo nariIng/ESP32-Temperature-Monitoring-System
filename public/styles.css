@@ -23,6 +23,11 @@ body {
 	display: flex;
 }
 
+canvas {
+	display: block;
+	margin: 20px auto;
+}
+
 .main {
 	display: flex;
 	flex-direction: column;

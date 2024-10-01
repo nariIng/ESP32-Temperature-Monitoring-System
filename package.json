@@ -1,18 +1,18 @@
 {
-    "name": "esp32-dht11-project",
+    "name": "esp32-temperature-webapp",
     "version": "1.0.0",
-    "main": "server/server.js",
+    "description": "Une application web en temps réel pour afficher les données des capteurs de température d'un ESP32.",
+    "main": "server.js",
     "scripts": {
-        "start": "node server/server.js"
+      "start": "node server.js"
     },
-    "author": "NARINDRA",
-    "license": "ISC",
     "dependencies": {
-        "body-parser": "^1.20.3",
-        "express": "^4.21.0",
-        "memory-fs": "^0.5.0",
-        "xlsx": "^0.18.5"
+      "axios": "^1.0.0",
+      "express": "^4.18.2",
+      "socket.io": "^4.5.4"
     },
-    "description": "",
-    "keywords": []
-}
+    "devDependencies": {},
+    "author": "Narindra",
+    "license": "MIT"
+  }
+  
