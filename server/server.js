@@ -37,7 +37,7 @@ app.get('/api/get-data', (req, res) => {
 // Route pour télécharger le fichier CSV depuis l'ESP32
 app.get('/api/download-csv', async (req, res) => {
   try {
-    const esp32Ip = 'http://<ESP32_IP_ADDRESS>'; // Remplacez par l'adresse IP de votre ESP32
+    const esp32Ip = 'http://192.168.0.102'; // Remplacez par l'adresse IP de votre ESP32
 
     // Envoyer une requête GET à l'ESP32 pour télécharger le fichier CSV
     const response = await axios.get(`${esp32Ip}/download-csv`, {
