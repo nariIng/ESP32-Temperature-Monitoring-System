@@ -39,6 +39,24 @@ document.addEventListener('DOMContentLoaded', function() {
   // Appeler fetchData toutes les 4 secondes pour mettre à jour les données en direct
   setInterval(fetchData, 4000);
 
+  document.getElementById('download-btn').addEventListener('click', () => {
+    window.location.href = '/api/download';
+});
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+    fetch('/api/reset', {
+        method: 'POST'
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log(data);
+        // Optionnel : mettre à jour l'interface utilisateur
+        alert('Données réinitialisées');
+    })
+    .catch(error => console.error('Erreur:', error));
+});
+
+
   // Gestionnaire d'événements pour le menu hamburger
   const hamburger = document.querySelector("#toggle-btn");
   hamburger.addEventListener("click", function(){
