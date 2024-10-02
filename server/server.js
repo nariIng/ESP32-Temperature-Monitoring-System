@@ -73,7 +73,15 @@ app.post('/api/post-data', (req, res) => {
 
 // Route pour obtenir les données sous forme JSON pour le client
 app.get('/api/get-data', (req, res) => {
-  res.json(sensorData);
+  try {
+    if (sensorData.length === 0) {
+      return res.json([]); // Renvoie un tableau vide si aucune donnée n'est disponible
+    }
+    res.json(sensorData); // Renvoie les données sous forme JSON
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Internal Server Error' }); // Renvoyer une erreur propre sous forme JSON
+  }
 });
 
 // Route pour télécharger le fichier Excel
