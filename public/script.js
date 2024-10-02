@@ -40,12 +40,12 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(fetchData, 4000);
 
   // Gestionnaire d'événements pour le téléchargement du fichier Excel
-  document.getElementById('downloadExcel').addEventListener('click', function() {
+  document.getElementById('download-btn').addEventListener('click', function() {
   window.location.href = '/api/download-excel';
   });
 
   // Réinitialiser les données
-  document.getElementById('resetData').addEventListener('click', function() {
+  document.getElementById('reset-btn').addEventListener('click', function() {
     fetch('/api/reset-excel', {
       method: 'POST'
     })
