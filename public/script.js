@@ -39,28 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Appeler fetchData toutes les 4 secondes pour mettre à jour les données en direct
   setInterval(fetchData, 4000);
 
-  // Gestionnaire d'événements pour le téléchargement du fichier Excel
-  const downloadButton = document.getElementById('download-btn');
-  downloadButton.addEventListener('click', function() {
-    window.location.href = '/api/generate-excel'; // Déclenche le téléchargement
-  });
-
-    // Gestionnaire d'événements pour la réinitialisation des données
-    const resetButton = document.getElementById('reset-btn');
-    resetButton.addEventListener('click', function() {
-      fetch('/api/reset-data', { method: 'POST' })
-        .then(response => response.text())
-        .then(message => {
-          alert(message); // Afficher un message de confirmation
-          fetchData(); // Mettre à jour le tableau après réinitialisation
-        })
-        .catch(error => console.error('Error resetting data:', error));
-    });
-
   // Gestionnaire d'événements pour le menu hamburger
   const hamburger = document.querySelector("#toggle-btn");
   hamburger.addEventListener("click", function(){
       document.querySelector("#sidebar").classList.toggle("expand");
   });
 });
-
