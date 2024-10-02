@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const fs = require('fs');
+const ExcelJS = require('exceljs');
 
 const app = express();
 const port = 3000;
@@ -28,15 +28,32 @@ app.get('/api/get-data', (req, res) => {
   res.json(sensorData);
 });
 
-// Route pour télécharger les données sous forme de fichier CSV
-app.get('/api/download', (req, res) => {
-  const csvHeader = 'time,T_1,T_2,T_3,T_4,T_5\n';
-  const csvRows = sensorData.map(row => `${row.time},${row.T_1},${row.T_2},${row.T_3},${row.T_4},${row.T_5}`).join('\n');
-  const csvData = csvHeader + csvRows;
+// Route pour télécharger les données sous forme de fichier Excel (.xlsx)
+app.get('/api/download', async (req, res) => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Données des Capteurs');
 
-  res.header('Content-Type', 'text/csv');
-  res.attachment('sensor_data.csv');
-  res.send(csvData);
+  // Ajouter l'en-tête
+  worksheet.columns = [
+    { header: 'Time', key: 'time', width: 20 },
+    { header: 'T_1', key: 'T_1', width: 10 },
+    { header: 'T_2', key: 'T_2', width: 10 },
+    { header: 'T_3', key: 'T_3', width: 10 },
+    { header: 'T_4', key: 'T_4', width: 10 },
+    { header: 'T_5', key: 'T_5', width: 10 },
+  ];
+
+  // Ajouter les données des capteurs
+  sensorData.forEach(data => {
+    worksheet.addRow(data);
+  });
+
+  // Envoyer le fichier Excel
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename=sensor_data.xlsx');
+
+  await workbook.xlsx.write(res);
+  res.end();
 });
 
 // Route pour réinitialiser les données
