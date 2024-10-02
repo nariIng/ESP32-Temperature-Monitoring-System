@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const XLSX = require('xlsx'); // Importer la bibliothèque xlsx
+const fs = require('fs');
 
 const app = express();
 const port = 3000;
@@ -27,10 +29,28 @@ app.get('/api/get-data', (req, res) => {
   res.json(sensorData);
 });
 
+// Route pour télécharger les données en tant que fichier Excel
+app.get('/api/download', (req, res) => {
+  const worksheet = XLSX.utils.json_to_sheet(sensorData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sensor Data');
+
+  const filePath = path.join(__dirname, 'sensor_data.xlsx');
+  XLSX.writeFile(workbook, filePath); // Écrire le fichier Excel
+
+  // Envoyer le fichier en tant que réponse
+  res.download(filePath, 'sensor_data.xlsx', (err) => {
+    if (err) {
+      console.error('Error sending file:', err);
+    }
+  });
+});
+
 // Démarrer le serveur
 app.listen(port, () => {
-  console.log(`Server running at http://joely_project.vercel.app:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
+
 
 
 

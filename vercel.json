@@ -5,11 +5,7 @@
     { "src": "public/**/*", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/post-data", "dest": "server/server.js" },
-    { "src": "/api/get-data", "dest": "server/server.js" },
-    { "src": "/api/download-excel", "dest": "server/server.js" },
-    { "src": "/api/reset-data", "dest": "server/server.js" },
+    { "src": "/api/(.*)", "dest": "server/server.js" },
     { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }
-
