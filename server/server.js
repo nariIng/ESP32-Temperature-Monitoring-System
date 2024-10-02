@@ -9,7 +9,7 @@ const app = express();
 const port = 3000;
 
 // Connectez-vous à MongoDB
-mongoose.connect('mongodb+srv://enarindr:<iFObf5hphmTweWWA>@cluster0.xnaub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb+srv://narindra:Emmanuela3,1415@data-bd.ezrn3.mongodb.net/?retryWrites=true&w=majority&appName=data-bd', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
