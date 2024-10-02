@@ -76,19 +76,25 @@ app.get('/api/download', (req, res) => {
 
 // Route pour réinitialiser les données et le fichier CSV
 app.post('/api/reset', (req, res) => {
-  // Réinitialiser les données en mémoire
-  sensorData = [];
+  try {
+    // Réinitialiser les données en mémoire
+    sensorData = [];
 
-  // Réinitialiser le fichier CSV avec uniquement l'en-tête
-  fs.writeFile(csvFilePath, 'Time,T_1,T_2,T_3,T_4,T_5\n', (err) => {
-    if (err) {
-      console.error('Erreur lors de la réinitialisation du fichier CSV:', err);
-      return res.status(500).send('Erreur lors de la réinitialisation.');
-    }
-    console.log('Données réinitialisées et fichier CSV réinitialisé.');
-    res.send('Données et fichier CSV réinitialisés.');
-  });
+    // Réinitialiser le fichier CSV avec uniquement l'en-tête
+    fs.writeFile(csvFilePath, 'Time,T_1,T_2,T_3,T_4,T_5\n', (err) => {
+      if (err) {
+        console.error('Erreur lors de la réinitialisation du fichier CSV:', err);
+        return res.status(500).send('Erreur lors de la réinitialisation.');
+      }
+      console.log('Données réinitialisées et fichier CSV réinitialisé.');
+      res.send('Données et fichier CSV réinitialisés.');
+    });
+  } catch (error) {
+    console.error('Erreur lors de la réinitialisation:', error);
+    res.status(500).send('Erreur lors de la réinitialisation des données.');
+  }
 });
+
 
 // Démarrer le serveur
 app.listen(port, () => {
