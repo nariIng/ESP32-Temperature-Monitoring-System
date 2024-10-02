@@ -60,6 +60,7 @@ app.get('/api/download-excel', (req, res) => {
   });
 });
 
+
 // Route pour réinitialiser les données du fichier Excel
 app.post('/api/reset-excel', (req, res) => {
   sensorData = [];  // Réinitialiser les données du tableau en mémoire

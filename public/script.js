@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Gestionnaire d'événements pour le téléchargement du fichier Excel
   const downloadButton = document.getElementById('download-btn');
   downloadButton.addEventListener('click', function() {
-    window.location.href = '/api/generate-excel'; // Déclenche le téléchargement
+    window.location.href = '/api/download-excel'; // Déclenche le téléchargement
   });
 
     // Gestionnaire d'événements pour la réinitialisation des données
