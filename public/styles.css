@@ -23,9 +23,9 @@ body {
 	display:flex;
 }
 
-canvas {
-	display: block;
-	margin: 20px auto;
+#TemperatureChart {
+    width: 100%; /* Ou une valeur fixe comme 600px */
+    height: 400px; /* Ajuste selon tes besoins */
 }
 
 .main {
