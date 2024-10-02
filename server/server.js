@@ -2,28 +2,22 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const mongoose = require('mongoose');
-const ExcelJS = require('exceljs');
+const fs = require('fs');
+const XLSX = require('xlsx');
 
-// Configuration de l'application
 const app = express();
 const port = 3000;
 
-// Connectez-vous à MongoDB
-mongoose.connect('mongodb+srv://narindra:Emmanuela3,1415@data-bd.ezrn3.mongodb.net/?retryWrites=true&w=majority&appName=data-bd', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+let sensorData = [];
 
-// Modèle Mongoose pour les données des capteurs
-const sensorDataSchema = new mongoose.Schema({
-  time: String,
-  T_1: Number,
-  T_2: Number,
-  T_3: Number,
-  T_4: Number,
-  T_5: Number
-});
-
-const SensorData = mongoose.model('SensorData', sensorDataSchema);
+// Connexion à MongoDB sans les options dépréciées
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+  });
 
 // Middleware pour analyser les requêtes POST
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -33,91 +27,53 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Route pour recevoir les données de l'ESP32
-app.post('/api/post-data', async (req, res) => {
+app.post('/api/post-data', (req, res) => {
   const { time, T_1, T_2, T_3, T_4, T_5 } = req.body;
+  sensorData.push({ time, T_1, T_2, T_3, T_4, T_5 });
+  console.log('Data received:', req.body);
 
-  // Créer un nouvel enregistrement dans MongoDB
-  const newData = new SensorData({ time, T_1, T_2, T_3, T_4, T_5 });
-  
-  try {
-    await newData.save();
-    console.log('Data received:', req.body);
-    res.send('Data received successfully');
-  } catch (error) {
-    console.error('Error saving data:', error);
-    res.status(500).send('Error saving data');
-  }
+  // Ajouter la logique de stockage dans MongoDB ici si nécessaire
+
+  res.send('Data received successfully');
 });
 
 // Route pour obtenir les données sous forme JSON pour le client
-app.get('/api/get-data', async (req, res) => {
-  try {
-    const data = await SensorData.find().sort({ _id: -1 }).limit(10); // Obtenir les 10 dernières entrées
-    res.json(data);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).send('Error fetching data');
-  }
-});
-
-// Route pour réinitialiser les données
-app.post('/api/reset-data', async (req, res) => {
-  try {
-    await SensorData.deleteMany(); // Effacer toutes les données
-    console.log('Données réinitialisées.');
-    res.send('Données réinitialisées.');
-  } catch (error) {
-    console.error('Error resetting data:', error);
-    res.status(500).send('Error resetting data');
-  }
+app.get('/api/get-data', (req, res) => {
+  res.json(sensorData);
 });
 
 // Route pour télécharger le fichier Excel
-app.get('/api/generate-excel', async (req, res) => {
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('Données des Capteurs');
+app.get('/api/download-excel', (req, res) => {
+  const ws = XLSX.utils.json_to_sheet(sensorData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "SensorData");
 
-  // Ajouter des en-têtes de colonnes
-  worksheet.columns = [
-    { header: 'Temps', key: 'time', width: 30 },
-    { header: 'Température 1 (°C)', key: 'T_1', width: 20 },
-    { header: 'Température 2 (°C)', key: 'T_2', width: 20 },
-    { header: 'Température 3 (°C)', key: 'T_3', width: 20 },
-    { header: 'Température 4 (°C)', key: 'T_4', width: 20 },
-    { header: 'Température 5 (°C)', key: 'T_5', width: 20 }
-  ];
+  const filePath = path.join(__dirname, 'sensor_data.xlsx');
+  XLSX.writeFile(wb, filePath);
 
-  try {
-    const sensorData = await SensorData.find(); // Récupérer toutes les données
+  res.download(filePath, 'sensor_data.xlsx', (err) => {
+    if (err) {
+      console.error('Error downloading file:', err);
+    } else {
+      console.log('Excel file downloaded successfully');
+    }
+  });
+});
 
-    // Ajouter les données des capteurs au fichier Excel
-    sensorData.forEach(data => {
-      worksheet.addRow(data.toObject());
-    });
+// Route pour réinitialiser les données du fichier Excel
+app.post('/api/reset-excel', (req, res) => {
+  sensorData = [];  // Réinitialiser les données du tableau en mémoire
 
-    // Générer le fichier Excel en mémoire
-    const buffer = await workbook.xlsx.writeBuffer();
-
-    // Définir les en-têtes de réponse pour le téléchargement
-    res.setHeader('Content-Disposition', 'attachment; filename=donnees_capteurs.xlsx');
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-    // Envoyer le buffer en réponse
-    res.send(buffer);
-  } catch (error) {
-    console.error('Error generating Excel file:', error);
-    res.status(500).send('Error generating Excel file');
+  // Supprimer l'ancien fichier Excel
+  const filePath = path.join(__dirname, 'sensor_data.xlsx');
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
   }
+
+  res.send('Data reset successfully');
 });
 
 // Démarrer le serveur
 app.listen(port, () => {
-  console.log(`Server running at http://joely-project.vercel.app:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
-
-
-
-
-
-
-
