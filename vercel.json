@@ -8,4 +8,7 @@
     { "src": "/api/(.*)", "dest": "server/server.js" },
     { "src": "/(.*)", "dest": "/public/$1" }
   ]
+  "env": {
+    "MONGO_URI": "@MONGO_URI" // Ceci fait référence à la variable d'environnement MONGO_URI
+  }
 }

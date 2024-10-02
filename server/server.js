@@ -2,33 +2,28 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const mongoose = require('mongoose');
-const fs = require('fs');
-const XLSX = require('xlsx');
+const ExcelJS = require('exceljs');
 
-// Initialiser l'application Express
 const app = express();
 const port = 3000;
 
-// Configuration de Mongoose pour la connexion à MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
-  });
+// Connection à MongoDB
+const uri = process.env.MONGO_URI;
 
-// Schéma pour stocker les données des capteurs
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((error) => console.error('Error connecting to MongoDB:', error));
+
+// Définition du modèle
 const sensorSchema = new mongoose.Schema({
-  time: String,
-  T_1: Number,
-  T_2: Number,
-  T_3: Number,
-  T_4: Number,
-  T_5: Number
-});
+  time: { type: String, required: true },
+  T_1: { type: Number, required: true },
+  T_2: { type: Number, required: true },
+  T_3: { type: Number, required: true },
+  T_4: { type: Number, required: true },
+  T_5: { type: Number, required: true },
+}, { timestamps: true });
 
-// Modèle MongoDB pour les données des capteurs
 const SensorData = mongoose.model('SensorData', sensorSchema);
 
 // Middleware pour analyser les requêtes POST
@@ -38,81 +33,70 @@ app.use(bodyParser.json());
 // Servir les fichiers statiques (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Route pour recevoir les données de l'ESP32 et les stocker dans MongoDB
+// Route pour recevoir les données de l'ESP32
 app.post('/api/post-data', async (req, res) => {
   const { time, T_1, T_2, T_3, T_4, T_5 } = req.body;
 
-  // Créer une nouvelle entrée dans MongoDB
-  const newSensorData = new SensorData({ time, T_1, T_2, T_3, T_4, T_5 });
-
   try {
-    await newSensorData.save();  // Stocker dans MongoDB
-    console.log('Data received and saved:', req.body);
-    res.send('Data received and saved successfully');
+    const sensorData = new SensorData({ time, T_1, T_2, T_3, T_4, T_5 });
+    await sensorData.save();
+    console.log('Data received:', req.body);
+    res.send('Data received successfully');
   } catch (error) {
-    console.error('Error saving data to MongoDB:', error);
-    res.status(500).send('Error saving data to MongoDB');
+    console.error('Error saving data:', error);
+    res.status(500).send('Error saving data');
   }
 });
 
-// Route pour obtenir les données stockées dans MongoDB
+// Route pour obtenir les données sous forme JSON pour le client
 app.get('/api/get-data', async (req, res) => {
   try {
-    const data = await SensorData.find().sort({ _id: -1 }).limit(10);  // Obtenir les 10 dernières entrées
+    const data = await SensorData.find().sort({ createdAt: -1 }).limit(10); // Récupérer les 10 dernières entrées
     res.json(data);
   } catch (error) {
-    console.error('Error fetching data from MongoDB:', error);
+    console.error('Error fetching data:', error);
     res.status(500).send('Error fetching data');
   }
 });
 
-// Route pour télécharger les données en tant que fichier Excel
+// Route pour télécharger les données sous forme de fichier Excel
 app.get('/api/download-excel', async (req, res) => {
   try {
-    const data = await SensorData.find();  // Obtenir toutes les données
+    const data = await SensorData.find();
 
-    // Créer un fichier Excel à partir des données
-    const ws = XLSX.utils.json_to_sheet(data.map(d => ({
-      time: d.time,
-      T_1: d.T_1,
-      T_2: d.T_2,
-      T_3: d.T_3,
-      T_4: d.T_4,
-      T_5: d.T_5
-    })));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "SensorData");
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Sensor Data');
 
-    const filePath = path.join(__dirname, 'sensor_data.xlsx');
-    XLSX.writeFile(wb, filePath);
+    worksheet.columns = [
+      { header: 'Time', key: 'time', width: 30 },
+      { header: 'T_1', key: 'T_1', width: 10 },
+      { header: 'T_2', key: 'T_2', width: 10 },
+      { header: 'T_3', key: 'T_3', width: 10 },
+      { header: 'T_4', key: 'T_4', width: 10 },
+      { header: 'T_5', key: 'T_5', width: 10 }
+    ];
 
-    // Télécharger le fichier
-    res.download(filePath, 'sensor_data.xlsx', (err) => {
-      if (err) {
-        console.error('Error downloading file:', err);
-      } else {
-        console.log('Excel file downloaded successfully');
-      }
+    data.forEach(entry => {
+      worksheet.addRow(entry.toObject());
     });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=sensor_data.xlsx');
+
+    await workbook.xlsx.write(res);
+    res.end();
   } catch (error) {
-    console.error('Error generating Excel file:', error);
-    res.status(500).send('Error generating Excel file');
+    console.error('Error downloading Excel:', error);
+    res.status(500).send('Error downloading Excel');
   }
 });
 
-// Route pour réinitialiser les données dans MongoDB et supprimer le fichier Excel
-app.post('/api/reset-excel', async (req, res) => {
+// Route pour réinitialiser les données
+app.post('/api/reset-data', async (req, res) => {
   try {
-    await SensorData.deleteMany();  // Supprimer toutes les données de MongoDB
-    console.log('All sensor data reset in MongoDB');
-
-    // Supprimer l'ancien fichier Excel
-    const filePath = path.join(__dirname, 'sensor_data.xlsx');
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    res.send('Data reset successfully');
+    await SensorData.deleteMany(); // Supprime toutes les entrées
+    console.log('All sensor data has been reset.');
+    res.send('All sensor data has been reset.');
   } catch (error) {
     console.error('Error resetting data:', error);
     res.status(500).send('Error resetting data');
@@ -123,4 +107,3 @@ app.post('/api/reset-excel', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
-
