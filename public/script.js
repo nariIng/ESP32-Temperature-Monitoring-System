@@ -40,24 +40,22 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(fetchData, 4000);
 
   // Gestionnaire d'événements pour le téléchargement du fichier Excel
-  document.getElementById('download-btn').addEventListener('click', function() {
-  window.location.href = '/api/download-excel';
+  const downloadButton = document.getElementById('download-btn');
+  downloadButton.addEventListener('click', function() {
+    window.location.href = '/api/generate-excel'; // Déclenche le téléchargement
   });
 
-  // Réinitialiser les données
-  document.getElementById('reset-btn').addEventListener('click', function() {
-    fetch('/api/reset-excel', {
-      method: 'POST'
-    })
-    .then(response => response.text())
-    .then(data => {
-      console.log('Data reset:', data);
-      alert('Les données ont été réinitialisées');
-    })
-    .catch(error => {
-      console.error('Error resetting data:', error);
+    // Gestionnaire d'événements pour la réinitialisation des données
+    const resetButton = document.getElementById('reset-btn');
+    resetButton.addEventListener('click', function() {
+      fetch('/api/reset-data', { method: 'POST' })
+        .then(response => response.text())
+        .then(message => {
+          alert(message); // Afficher un message de confirmation
+          fetchData(); // Mettre à jour le tableau après réinitialisation
+        })
+        .catch(error => console.error('Error resetting data:', error));
     });
-  });
 
   // Gestionnaire d'événements pour le menu hamburger
   const hamburger = document.querySelector("#toggle-btn");
@@ -65,3 +63,4 @@ document.addEventListener('DOMContentLoaded', function() {
       document.querySelector("#sidebar").classList.toggle("expand");
   });
 });
+
