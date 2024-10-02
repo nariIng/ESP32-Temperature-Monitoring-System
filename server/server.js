@@ -1,8 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const XLSX = require('xlsx'); // Importer la bibliothèque xlsx
-const fs = require('fs');
+const ExcelJS = require('exceljs');
 
 const app = express();
 const port = 3000;
@@ -29,29 +28,77 @@ app.get('/api/get-data', (req, res) => {
   res.json(sensorData);
 });
 
-// Route pour télécharger les données en tant que fichier Excel
-app.get('/api/download', (req, res) => {
-  const worksheet = XLSX.utils.json_to_sheet(sensorData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sensor Data');
+// Route pour réinitialiser les données
+app.post('/api/reset-data', (req, res) => {
+  sensorData = []; // Réinitialiser les données
+  console.log('Données réinitialisées.');
 
-  const filePath = path.join(__dirname, 'sensor_data.xlsx');
-  XLSX.writeFile(workbook, filePath); // Écrire le fichier Excel
+  // Créer un nouveau fichier Excel vide
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Données des Capteurs');
 
-  // Envoyer le fichier en tant que réponse
-  res.download(filePath, 'sensor_data.xlsx', (err) => {
+  // Ajouter des en-têtes de colonnes
+  worksheet.columns = [
+    { header: 'Temps', key: 'time', width: 30 },
+    { header: 'Température 1 (°C)', key: 'T_1', width: 20 },
+    { header: 'Température 2 (°C)', key: 'T_2', width: 20 },
+    { header: 'Température 3 (°C)', key: 'T_3', width: 20 },
+    { header: 'Température 4 (°C)', key: 'T_4', width: 20 },
+    { header: 'Température 5 (°C)', key: 'T_5', width: 20 }
+  ];
+
+  // Enregistrer le nouveau fichier Excel vide
+  const filePath = path.join(__dirname, 'donnees_capteurs.xlsx');
+  workbook.xlsx.writeFile(filePath)
+    .then(() => {
+      console.log('Fichier Excel réinitialisé.');
+      res.send('Données réinitialisées et fichier Excel créé.');
+    })
+    .catch((error) => {
+      console.error('Erreur lors de la réinitialisation du fichier Excel:', error);
+      res.status(500).send('Erreur lors de la réinitialisation des données.');
+    });
+});
+
+// Route pour générer le fichier Excel
+app.get('/api/generate-excel', async (req, res) => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Données des Capteurs');
+
+  // Ajouter des en-têtes de colonnes
+  worksheet.columns = [
+    { header: 'Temps', key: 'time', width: 30 },
+    { header: 'Température 1 (°C)', key: 'T_1', width: 20 },
+    { header: 'Température 2 (°C)', key: 'T_2', width: 20 },
+    { header: 'Température 3 (°C)', key: 'T_3', width: 20 },
+    { header: 'Température 4 (°C)', key: 'T_4', width: 20 },
+    { header: 'Température 5 (°C)', key: 'T_5', width: 20 }
+  ];
+
+  // Ajouter les données des capteurs au fichier Excel
+  sensorData.forEach(data => {
+    worksheet.addRow(data);
+  });
+
+  // Générer le fichier Excel
+  const filePath = path.join(__dirname, 'donnees_capteurs.xlsx');
+  await workbook.xlsx.writeFile(filePath);
+
+  // Envoyer le fichier Excel au client
+  res.download(filePath, 'donnees_capteurs.xlsx', (err) => {
     if (err) {
-      console.error('Error sending file:', err);
+      console.error('Erreur lors de l\'envoi du fichier:', err);
+    }
+    else {
+      console.log('Fichier telecharger ave succes');
     }
   });
 });
 
 // Démarrer le serveur
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at http://joely-project.vercel.app:${port}`);
 });
-
-
 
 
 

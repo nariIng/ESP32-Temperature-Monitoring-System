@@ -6,6 +6,7 @@
 #include <SD.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+#include <WebServer.h>
 
 // Wi-Fi configuration
 const char* ssid = "Arivelo2";
@@ -122,5 +123,5 @@ void loop() {
   }
 
   // Wait for a minute before next reading
-  delay(2000);
+  delay(3000);
 }
