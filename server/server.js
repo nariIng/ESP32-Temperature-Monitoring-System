@@ -37,7 +37,7 @@ app.get('/api/get-data', (req, res) => {
 // Route pour télécharger le fichier CSV depuis l'ESP32
 app.get('/api/download-csv', async (req, res) => {
   try {
-    const esp32Ip = 'http://192.168.0.102'; // Remplacez par l'adresse IP de votre ESP32
+    const esp32Ip = 'http://192.168.0.103'; // Remplacez par l'adresse IP de votre ESP32
 
     // Envoyer une requête GET à l'ESP32 pour télécharger le fichier CSV
     const response = await axios.get(`${esp32Ip}/download-csv`, {
@@ -77,7 +77,7 @@ app.get('/api/download-csv', async (req, res) => {
 // Route pour réinitialiser les données de l'ESP32
 app.get('/api/reset-data', async (req, res) => {
   try {
-    const esp32Ip = 'http://192.168.0.102'; // Remplacez par l'adresse IP de votre ESP32
+    const esp32Ip = 'http://192.168.0.103'; // Remplacez par l'adresse IP de votre ESP32
 
     // Envoyer une requête pour réinitialiser les données sur l'ESP32
     await axios.post(`${esp32Ip}/reset`, { command: 'reset' });
