@@ -43,8 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return secondsToTime(value); // Convertir les secondes en hh:mm:ss pour l'affichage
               }
             },
-            // Limite de l'axe des abscisses à partir du premier temps transmis
-            min: 0 // Cette valeur sera mise à jour plus tard avec la première valeur de temps
+            min: undefined // Cette valeur sera définie dynamiquement
           },
           y: {
             title: {
@@ -96,9 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
           const T_4 = data.map(entry => entry.T_4);
           const T_5 = data.map(entry => entry.T_5);
   
-          // Définir la valeur minimale de l'axe des abscisses (premier temps transmis)
-          temperatureChart.options.scales.x.min = Math.min(...timeLabels);
-  
           // Mettre à jour les labels et les données du graphique
           temperatureChart.data.labels = timeLabels;
           temperatureChart.data.datasets[0].data = T_1;
@@ -106,6 +102,9 @@ document.addEventListener('DOMContentLoaded', function() {
           temperatureChart.data.datasets[2].data = T_3;
           temperatureChart.data.datasets[3].data = T_4;
           temperatureChart.data.datasets[4].data = T_5;
+  
+          // Ajuster l'axe des abscisses pour commencer au premier temps reçu
+          temperatureChart.options.scales.x.min = timeLabels[0]; // Temps initial
   
           // Rafraîchir le graphique
           temperatureChart.update();
@@ -141,6 +140,5 @@ document.addEventListener('DOMContentLoaded', function() {
       document.querySelector("#sidebar").classList.toggle("expand");
     });
   });
-  
   
   
