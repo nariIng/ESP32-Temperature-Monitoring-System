@@ -66,7 +66,12 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
   
             sensorTableBody.appendChild(row);
-            
+            document.getElementById('time').textContent = entry.time;
+            document.getElementById('temperature_1').textContent = entry.T_1;
+            document.getElementById('temperature_2').textContent = entry.T_2;
+            document.getElementById('temperature_3').textContent = entry.T_3;
+            document.getElementById('temperature_4').textContent = entry.T_4;
+            document.getElementById('temperature_5').textContent = entry.T_5;
           });
   
           // Mise à jour du graphique avec toutes les données
