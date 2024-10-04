@@ -2,11 +2,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const sensorTableBody = document.querySelector('#sensorTable tbody');
     const ctx = document.getElementById('temperatureChart').getContext('2d');
   
-    // Initialisation du graphique
+    // Fonction pour convertir le temps en format hh:mm:ss
+    function secondsToTime(seconds) {
+      const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+      const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+  
+    // Fonction pour convertir le temps hh:mm:ss en secondes
+    function timeToSeconds(timeStr) {
+      const parts = timeStr.split(':');
+      const hours = parseInt(parts[0], 10);
+      const minutes = parseInt(parts[1], 10);
+      const seconds = parseInt(parts[2], 10);
+      return hours * 3600 + minutes * 60 + seconds;
+    }
+  
+    // Initialisation du graphique avec Chart.js
     const temperatureChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: [], // Temps
+        labels: [], // Temps en secondes
         datasets: [
           { label: 'T_1', data: [], borderColor: 'red', fill: false },
           { label: 'T_2', data: [], borderColor: 'blue', fill: false },
@@ -17,30 +34,28 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,  // Permet une adaptation de la hauteur
+        maintainAspectRatio: false, // Permet de personnaliser la hauteur
         scales: {
           x: {
             title: {
               display: true,
-              text: 'Temps (secondes)'
+              text: 'Temps (hh:mm:ss)'
+            },
+            ticks: {
+              callback: function(value, index, values) {
+                return secondsToTime(value); // Convertir les secondes en hh:mm:ss
+              }
             }
           },
           y: {
             title: {
               display: true,
               text: 'Température (°C)'
-            },
-            beginAtZero: false // Les axes s'ajustent automatiquement
+            }
           }
         }
       }
     });
-  
-    // Fonction pour convertir le temps en secondes
-    function timeToSeconds(time) {
-      const [hours, minutes, seconds] = time.split(':').map(Number);
-      return hours * 3600 + minutes * 60 + seconds;
-    }
   
     // Fonction pour récupérer les données et mettre à jour le tableau et le graphique
     function fetchData() {
@@ -49,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
           sensorTableBody.innerHTML = ''; // Vider le tableau
   
-          // Limiter les données aux 10 dernières entrées pour le tableau
+          // Limiter les données aux 10 dernières entrées
           const last10Entries = data.slice(-10);
   
           // Ajouter une nouvelle ligne pour chaque jeu de données
@@ -66,23 +81,23 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
   
             sensorTableBody.appendChild(row);
-            document.getElementById('time').textContent = entry.time;
-            document.getElementById('temperature_1').textContent = entry.T_1;
-            document.getElementById('temperature_2').textContent = entry.T_2;
-            document.getElementById('temperature_3').textContent = entry.T_3;
-            document.getElementById('temperature_4').textContent = entry.T_4;
-            document.getElementById('temperature_5').textContent = entry.T_5;
+            document.getElementById("time").textContent = entry.time;
+            document.getElementById("temperature_1").textContent = entry.T_1;
+            document.getElementById("temperature_2").textContent = entry.T_2;
+            document.getElementById("temperature_3").textContent = entry.T_3;
+            document.getElementById("temperature_4").textContent = entry.T_4;
+            document.getElementById("temperature_5").textContent = entry.T_5;
           });
   
-          // Mise à jour du graphique avec toutes les données
-          const timeLabels = data.map(entry => timeToSeconds(entry.time));
-          const T_1 = data.map(entry => entry.T_1);
-          const T_2 = data.map(entry => entry.T_2);
-          const T_3 = data.map(entry => entry.T_3);
-          const T_4 = data.map(entry => entry.T_4);
-          const T_5 = data.map(entry => entry.T_5);
+          // Mettre à jour le graphique avec les nouvelles données
+          const timeLabels = last10Entries.map(entry => timeToSeconds(entry.time));
+          const T_1 = last10Entries.map(entry => entry.T_1);
+          const T_2 = last10Entries.map(entry => entry.T_2);
+          const T_3 = last10Entries.map(entry => entry.T_3);
+          const T_4 = last10Entries.map(entry => entry.T_4);
+          const T_5 = last10Entries.map(entry => entry.T_5);
   
-          // Mettre à jour les labels (temps) et les données des 5 courbes
+          // Mettre à jour les labels et les données du graphique
           temperatureChart.data.labels = timeLabels;
           temperatureChart.data.datasets[0].data = T_1;
           temperatureChart.data.datasets[1].data = T_2;
@@ -110,6 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(response => response.text())
       .then(data => {
         console.log(data);
+        // Optionnel : mettre à jour l'interface utilisateur
         alert('Données réinitialisées');
       })
       .catch(error => console.error('Erreur:', error));
@@ -118,7 +134,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Gestionnaire d'événements pour le menu hamburger
     const hamburger = document.querySelector("#toggle-btn");
     hamburger.addEventListener("click", function(){
-        document.querySelector("#sidebar").classList.toggle("expand");
+      document.querySelector("#sidebar").classList.toggle("expand");
     });
   });
+  
   
