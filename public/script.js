@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
   
             sensorTableBody.appendChild(row);
+            
           });
   
           // Mise à jour du graphique avec toutes les données
