@@ -2,7 +2,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const sensorTableBody = document.querySelector('#sensorTable tbody');
     const ctx = document.getElementById('temperatureChart').getContext('2d');
   
-    // Fonction pour convertir le temps en format hh:mm:ss
+    // Fonction pour convertir le temps en secondes (de hh:mm:ss)
+    function timeToSeconds(time) {
+      const [hh, mm, ss] = time.split(':').map(Number);
+      return hh * 3600 + mm * 60 + ss;
+    }
+  
+    // Fonction pour convertir les secondes en hh:mm:ss
     function secondsToTime(seconds) {
       const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
       const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
@@ -10,16 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
       return `${h}:${m}:${s}`;
     }
   
-    // Fonction pour convertir le temps hh:mm:ss en secondes
-    function timeToSeconds(timeStr) {
-      const parts = timeStr.split(':');
-      const hours = parseInt(parts[0], 10);
-      const minutes = parseInt(parts[1], 10);
-      const seconds = parseInt(parts[2], 10);
-      return hours * 3600 + minutes * 60 + seconds;
-    }
-  
-    // Initialisation du graphique avec Chart.js
+    // Initialisation du graphique
     const temperatureChart = new Chart(ctx, {
       type: 'line',
       data: {
@@ -34,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false, // Permet de personnaliser la hauteur
+        maintainAspectRatio: false, // Le ratio du graphique ne sera pas forcé
         scales: {
           x: {
             title: {
@@ -42,8 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
               text: 'Temps (hh:mm:ss)'
             },
             ticks: {
-              callback: function(value, index, values) {
-                return secondsToTime(value); // Convertir les secondes en hh:mm:ss
+              callback: function(value) {
+                return secondsToTime(value); // Convertir les secondes en hh:mm:ss pour l'affichage
               }
             }
           },
@@ -89,13 +86,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById("temperature_5").textContent = entry.T_5;
           });
   
-          // Mettre à jour le graphique avec les nouvelles données
-          const timeLabels = last10Entries.map(entry => timeToSeconds(entry.time));
-          const T_1 = last10Entries.map(entry => entry.T_1);
-          const T_2 = last10Entries.map(entry => entry.T_2);
-          const T_3 = last10Entries.map(entry => entry.T_3);
-          const T_4 = last10Entries.map(entry => entry.T_4);
-          const T_5 = last10Entries.map(entry => entry.T_5);
+          // Mettre à jour les données du graphique
+          const timeLabels = data.map(entry => timeToSeconds(entry.time)); // Convertir le temps en secondes
+          const T_1 = data.map(entry => entry.T_1);
+          const T_2 = data.map(entry => entry.T_2);
+          const T_3 = data.map(entry => entry.T_3);
+          const T_4 = data.map(entry => entry.T_4);
+          const T_5 = data.map(entry => entry.T_5);
   
           // Mettre à jour les labels et les données du graphique
           temperatureChart.data.labels = timeLabels;
@@ -105,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
           temperatureChart.data.datasets[3].data = T_4;
           temperatureChart.data.datasets[4].data = T_5;
   
-          // Actualiser le graphique
+          // Rafraîchir le graphique
           temperatureChart.update();
         })
         .catch(error => console.error('Error fetching data:', error));
@@ -114,26 +111,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Appeler fetchData toutes les 4 secondes pour mettre à jour les données en direct
     setInterval(fetchData, 4000);
   
+    // Bouton de téléchargement du fichier Excel
     document.getElementById('download-btn').addEventListener('click', () => {
       window.location.href = '/api/download';
     });
   
+    // Bouton reset pour réinitialiser les données
     document.getElementById('reset-btn').addEventListener('click', () => {
       fetch('/api/reset', {
         method: 'POST'
       })
-      .then(response => response.text())
-      .then(data => {
-        console.log(data);
-        // Optionnel : mettre à jour l'interface utilisateur
-        alert('Données réinitialisées');
-      })
-      .catch(error => console.error('Erreur:', error));
+        .then(response => response.text())
+        .then(data => {
+          console.log(data);
+          // Optionnel : mettre à jour l'interface utilisateur
+          alert('Données réinitialisées');
+        })
+        .catch(error => console.error('Erreur:', error));
     });
   
     // Gestionnaire d'événements pour le menu hamburger
     const hamburger = document.querySelector("#toggle-btn");
-    hamburger.addEventListener("click", function(){
+    hamburger.addEventListener("click", function() {
       document.querySelector("#sidebar").classList.toggle("expand");
     });
   });
