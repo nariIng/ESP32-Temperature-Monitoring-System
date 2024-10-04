@@ -1,3 +1,84 @@
+// Récupérer les données du serveur
+fetch('/api/get-data')
+  .then(response => response.json())
+  .then(sensorData => {
+    // Conversion du temps en secondes pour chaque point de donnée
+    const timeLabels = sensorData.map(data => timeToSeconds(data.time));
+    
+    // Extraire les données de température
+    const T_1 = sensorData.map(data => data.T_1);
+    const T_2 = sensorData.map(data => data.T_2);
+    const T_3 = sensorData.map(data => data.T_3);
+    const T_4 = sensorData.map(data => data.T_4);
+    const T_5 = sensorData.map(data => data.T_5);
+
+    // Créer le graphique
+    const ctx = document.getElementById('temperatureChart').getContext('2d');
+    const temperatureChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: timeLabels,  // Temps en secondes
+        datasets: [
+          {
+            label: 'T_1',
+            data: T_1,
+            borderColor: 'red',
+            fill: false
+          },
+          {
+            label: 'T_2',
+            data: T_2,
+            borderColor: 'blue',
+            fill: false
+          },
+          {
+            label: 'T_3',
+            data: T_3,
+            borderColor: 'green',
+            fill: false
+          },
+          {
+            label: 'T_4',
+            data: T_4,
+            borderColor: 'orange',
+            fill: false
+          },
+          {
+            label: 'T_5',
+            data: T_5,
+            borderColor: 'purple',
+            fill: false
+          }
+        ]
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'linear',
+            title: {
+              display: true,
+              text: 'Temps (secondes)'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Température (°C)'
+            }
+          }
+        }
+      }
+    });
+  })
+  .catch(error => console.error('Erreur lors du chargement des données:', error));
+
+// Fonction pour convertir le temps en secondes
+function timeToSeconds(time) {
+    const [hours, minutes, seconds] = time.split(':').map(Number);
+    return hours * 3600 + minutes * 60 + seconds;
+}
+//////***///// */
+
 document.addEventListener('DOMContentLoaded', function() {
   const sensorTableBody = document.querySelector('#sensorTable tbody');
 
