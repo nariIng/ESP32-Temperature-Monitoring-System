@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,  // Permet une adaptation de la hauteur
+        //maintainAspectRatio: false,  // Permet une adaptation de la hauteur
         scales: {
           x: {
             title: {
