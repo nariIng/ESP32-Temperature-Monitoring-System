@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
       options: {
         responsive: true,
         maintainAspectRatio: false, // Le ratio du graphique ne sera pas forcé
-       // Modifiez l'initialisation de l'axe des x pour qu'il affiche les labels de temps
         scales: {
           x: {
             title: {
@@ -41,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             ticks: {
               callback: function(value, index, values) {
-                return temperatureChart.data.labels[index]; // Utiliser directement le label (format hh:mm:ss)
+                return values[index].label; // Afficher directement les labels du temps (hh:mm:ss)
               }
             }
           },
@@ -52,66 +51,68 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           }
         }
-
       }
     });
   
     // Fonction pour récupérer les données et mettre à jour le tableau et le graphique
-    function fetchData() {
-      fetch('/api/get-data')
-        .then(response => response.json())
-        .then(data => {
-          sensorTableBody.innerHTML = ''; // Vider le tableau
-  
-          // Limiter les données aux 10 dernières entrées
-          const last10Entries = data.slice(-10);
-  
-          // Ajouter une nouvelle ligne pour chaque jeu de données
-          last10Entries.forEach(entry => {
-            const row = document.createElement('tr');
-  
-            row.innerHTML = `
-              <td>${entry.time}</td>
-              <td>${entry.T_1}</td>
-              <td>${entry.T_2}</td>
-              <td>${entry.T_3}</td>
-              <td>${entry.T_4}</td>
-              <td>${entry.T_5}</td>
-            `;
-  
-            sensorTableBody.appendChild(row);
-            document.getElementById("time").textContent = entry.time;
-            document.getElementById("temperature_1").textContent = entry.T_1;
-            document.getElementById("temperature_2").textContent = entry.T_2;
-            document.getElementById("temperature_3").textContent = entry.T_3;
-            document.getElementById("temperature_4").textContent = entry.T_4;
-            document.getElementById("temperature_5").textContent = entry.T_5;
-          });
-  
-          // Mettre à jour les données du graphique
-          const timeLabels = last10Entries.map(entry => entry.time); // Utiliser le format hh:mm:ss pour les labels
-          const T_1 = last10Entries.map(entry => entry.T_1);
-          const T_2 = last10Entries.map(entry => entry.T_2);
-          const T_3 = last10Entries.map(entry => entry.T_3);
-          const T_4 = last10Entries.map(entry => entry.T_4);
-          const T_5 = last10Entries.map(entry => entry.T_5);
+// Fonction pour récupérer les données et mettre à jour le tableau et le graphique
+function fetchData() {
+  fetch('/api/get-data')
+    .then(response => response.json())
+    .then(data => {
+      sensorTableBody.innerHTML = ''; // Vider le tableau
 
-          // Mettre à jour les labels et les données du graphique
-          temperatureChart.data.labels = timeLabels; // Mettre les labels au format hh:mm:ss
-          temperatureChart.data.datasets[0].data = T_1;
-          temperatureChart.data.datasets[1].data = T_2;
-          temperatureChart.data.datasets[2].data = T_3;
-          temperatureChart.data.datasets[3].data = T_4;
-          temperatureChart.data.datasets[4].data = T_5;
+      // Limiter les données aux 10 dernières entrées
+      const last10Entries = data.slice(-10);
 
-          // Ajuster la portée de l'axe des x pour démarrer à partir du temps initial dans le tableau
-          temperatureChart.options.scales.x.min = timeLabels[0]; // Définir le temps initial comme min
+      // Ajouter une nouvelle ligne pour chaque jeu de données
+      last10Entries.forEach(entry => {
+        const row = document.createElement('tr');
 
-          // Rafraîchir le graphique
-          temperatureChart.update();
-        })
-        .catch(error => console.error('Error fetching data:', error));
-    }
+        row.innerHTML = 
+          `<td>${entry.time}</td>
+          <td>${entry.T_1}</td>
+          <td>${entry.T_2}</td>
+          <td>${entry.T_3}</td>
+          <td>${entry.T_4}</td>
+          <td>${entry.T_5}</td>`;
+
+        sensorTableBody.appendChild(row);
+        document.getElementById("time").textContent = entry.time;
+        document.getElementById("temperature_1").textContent = entry.T_1;
+        document.getElementById("temperature_2").textContent = entry.T_2;
+        document.getElementById("temperature_3").textContent = entry.T_3;
+        document.getElementById("temperature_4").textContent = entry.T_4;
+        document.getElementById("temperature_5").textContent = entry.T_5;
+      });
+
+      // Mettre à jour les données du graphique
+      const timeLabels = last10Entries.map(entry => entry.time); // Utiliser le format hh:mm:ss pour les labels
+      const timeInSeconds = last10Entries.map(entry => timeToSeconds(entry.time)); // Convertir en secondes
+      const T_1 = last10Entries.map(entry => entry.T_1);
+      const T_2 = last10Entries.map(entry => entry.T_2);
+      const T_3 = last10Entries.map(entry => entry.T_3);
+      const T_4 = last10Entries.map(entry => entry.T_4);
+      const T_5 = last10Entries.map(entry => entry.T_5);
+
+      // Mettre à jour les labels et les données du graphique
+      temperatureChart.data.labels = timeInSeconds.map(seconds => secondsToTime(seconds)); // Convertir les secondes en hh:mm:ss pour les labels
+      temperatureChart.data.datasets[0].data = T_1;
+      temperatureChart.data.datasets[1].data = T_2;
+      temperatureChart.data.datasets[2].data = T_3;
+      temperatureChart.data.datasets[3].data = T_4;
+      temperatureChart.data.datasets[4].data = T_5;
+
+      // Ajuster la portée de l'axe des x pour démarrer à partir du temps initial dans le tableau
+      temperatureChart.options.scales.x.min = timeInSeconds[0]; // Définir le temps initial comme min
+      temperatureChart.options.scales.x.max = timeInSeconds[timeInSeconds.length - 1]; // Définir le temps final comme max
+
+      // Rafraîchir le graphique
+      temperatureChart.update();
+    })
+    .catch(error => console.error('Error fetching data:', error));
+}
+
   
     // Appeler fetchData toutes les 4 secondes pour mettre à jour les données en direct
     setInterval(fetchData, 4000);
