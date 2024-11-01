@@ -88,13 +88,14 @@ document.addEventListener('DOMContentLoaded', function() {
           });
   
           // Mettre à jour les données du graphique
-          const timeLabels = data.map(entry => timeToSeconds(entry.time)); // Convertir le temps en secondes
+          // Mettre à jour les données du graphique
+          const timeLabels = data.map(entry => entry.time); // Utiliser le format hh:mm:ss directement pour les labels
           const T_1 = data.map(entry => entry.T_1);
           const T_2 = data.map(entry => entry.T_2);
           const T_3 = data.map(entry => entry.T_3);
           const T_4 = data.map(entry => entry.T_4);
           const T_5 = data.map(entry => entry.T_5);
-  
+
           // Mettre à jour les labels et les données du graphique
           // Mettre à jour les labels et les données du graphique
           temperatureChart.data.labels = data.map(entry => entry.time); // Utilisez directement le format hh:mm:ss
@@ -109,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   
           // Ajuster l'axe des abscisses pour commencer au premier temps reçu
-          temperatureChart.options.scales.x.min = timeLabels[0]; // Temps initial
+          // temperatureChart.options.scales.x.min = timeLabels[0]; // Temps initial
   
           // Rafraîchir le graphique
           temperatureChart.update();
