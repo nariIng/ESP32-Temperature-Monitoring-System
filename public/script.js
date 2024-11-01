@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <td>${entry.T_5}</td>
             `;
   
+            
             sensorTableBody.appendChild(row);
             document.getElementById("time").textContent = entry.time;
             document.getElementById("temperature_1").textContent = entry.T_1;
