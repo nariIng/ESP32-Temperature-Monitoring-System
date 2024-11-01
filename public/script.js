@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <td>${entry.T_5}</td>
             `;
   
-            
+
             sensorTableBody.appendChild(row);
             document.getElementById("time").textContent = entry.time;
             document.getElementById("temperature_1").textContent = entry.T_1;
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
           // Mettre à jour les labels et les données du graphique
           // Mettre à jour les labels et les données du graphique
-          temperatureChart.data.labels = data.map(entry => entry.time); // Utilisez directement le format hh:mm:ss
+          temperatureChart.data.labels = entry.time; // Utilisez directement le format hh:mm:ss
           temperatureChart.data.datasets[0].data = T_1;
           temperatureChart.data.datasets[1].data = T_2;
           temperatureChart.data.datasets[2].data = T_3;
