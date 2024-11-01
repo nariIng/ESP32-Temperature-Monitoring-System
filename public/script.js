@@ -96,12 +96,17 @@ document.addEventListener('DOMContentLoaded', function() {
           const T_5 = data.map(entry => entry.T_5);
   
           // Mettre à jour les labels et les données du graphique
-          temperatureChart.data.labels = timeLabels;
+          // Mettre à jour les labels et les données du graphique
+          temperatureChart.data.labels = data.map(entry => entry.time); // Utilisez directement le format hh:mm:ss
           temperatureChart.data.datasets[0].data = T_1;
           temperatureChart.data.datasets[1].data = T_2;
           temperatureChart.data.datasets[2].data = T_3;
           temperatureChart.data.datasets[3].data = T_4;
           temperatureChart.data.datasets[4].data = T_5;
+
+// Supprimez cette ligne car elle n'est plus nécessaire
+// temperatureChart.options.scales.x.min = timeLabels[0]; 
+
   
           // Ajuster l'axe des abscisses pour commencer au premier temps reçu
           temperatureChart.options.scales.x.min = timeLabels[0]; // Temps initial
