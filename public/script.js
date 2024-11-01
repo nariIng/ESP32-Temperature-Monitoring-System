@@ -96,22 +96,31 @@ document.addEventListener('DOMContentLoaded', function() {
           const T_4 = data.map(entry => entry.T_4);
           const T_5 = data.map(entry => entry.T_5);
 
-          // Mettre à jour les labels et les données du graphique
+         // Mettre à jour les labels et les données du graphique
           temperatureChart.data.labels = timeLabels; // Mettre les labels au format hh:mm:ss
           temperatureChart.data.datasets[0].data = T_1;
           temperatureChart.data.datasets[1].data = T_2;
           temperatureChart.data.datasets[2].data = T_3;
           temperatureChart.data.datasets[3].data = T_4;
           temperatureChart.data.datasets[4].data = T_5;
-  
+
+          // Définir la valeur minimale de l'axe des x à la première entrée
+          temperatureChart.options.scales.x.min = timeToSeconds(timeLabels[0]); // Convertir l'heure en secondes
+
+          // Convertir les labels pour les afficher au format hh:mm:ss
+          temperatureChart.options.scales.x.ticks.callback = function(value) {
+              return secondsToTime(value); // Utiliser la fonction pour convertir en hh:mm:ss
+          };
+
           // Rafraîchir le graphique
           temperatureChart.update();
+
         })
         .catch(error => console.error('Error fetching data:', error));
     }
   
     // Appeler fetchData toutes les 4 secondes pour mettre à jour les données en direct
-    setInterval(fetchData, 4000);
+    setInterval(fetchData, 5000);
   
     // Bouton de téléchargement du fichier Excel
     document.getElementById('download-btn').addEventListener('click', () => {
