@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const temperatureChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: [], // Temps en hh:mm:ss
+      labels: [], // Temps en secondes
       datasets: [
         { label: 'T_1', data: [], borderColor: 'red', fill: false },
         { label: 'T_2', data: [], borderColor: 'blue', fill: false },
@@ -39,11 +39,10 @@ document.addEventListener('DOMContentLoaded', function() {
             text: 'Temps (hh:mm:ss)'
           },
           ticks: {
-            callback: function(value) {
-              return secondsToTime(value); // Convertir les secondes en hh:mm:ss pour l'affichage
+            callback: function(value, index, values) {
+              return values[index].label; // Afficher directement les labels du temps (hh:mm:ss)
             }
-          },
-          min: undefined // Cette valeur sera définie dynamiquement
+          }
         },
         y: {
           title: {
@@ -88,24 +87,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Mettre à jour les données du graphique
-        const timeLabels = data.map(entry => timeToSeconds(entry.time)); // Convertir les temps en secondes
-        const initialTime = timeLabels[0]; // Temps initial pour l'axe x
-        const T_1 = data.map(entry => entry.T_1);
-        const T_2 = data.map(entry => entry.T_2);
-        const T_3 = data.map(entry => entry.T_3);
-        const T_4 = data.map(entry => entry.T_4);
-        const T_5 = data.map(entry => entry.T_5);
+        const timeLabels = last10Entries.map(entry => entry.time); // Utiliser le format hh:mm:ss pour les labels
+        const T_1 = last10Entries.map(entry => entry.T_1);
+        const T_2 = last10Entries.map(entry => entry.T_2);
+        const T_3 = last10Entries.map(entry => entry.T_3);
+        const T_4 = last10Entries.map(entry => entry.T_4);
+        const T_5 = last10Entries.map(entry => entry.T_5);
 
         // Mettre à jour les labels et les données du graphique
-        temperatureChart.data.labels = timeLabels.map(secondsToTime); // Convertir en hh:mm:ss pour l'affichage
+        temperatureChart.data.labels = timeLabels; // Mettre les labels au format hh:mm:ss
         temperatureChart.data.datasets[0].data = T_1;
         temperatureChart.data.datasets[1].data = T_2;
         temperatureChart.data.datasets[2].data = T_3;
         temperatureChart.data.datasets[3].data = T_4;
         temperatureChart.data.datasets[4].data = T_5;
 
-        // Définir le min de l'axe x pour commencer au temps initial
-        temperatureChart.options.scales.x.min = initialTime;
+        // Ajuster la portée de l'axe des x pour démarrer à partir du temps initial dans le tableau
+        temperatureChart.options.scales.x.min = timeLabels[0]; // Définir le temps initial comme min
 
         // Rafraîchir le graphique
         temperatureChart.update();
