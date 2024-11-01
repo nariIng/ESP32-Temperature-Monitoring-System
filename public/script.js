@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <td>${entry.T_5}</td>
             `;
   
-
+            
             sensorTableBody.appendChild(row);
             document.getElementById("time").textContent = entry.time;
             document.getElementById("temperature_1").textContent = entry.T_1;
@@ -89,7 +89,6 @@ document.addEventListener('DOMContentLoaded', function() {
           });
   
           // Mettre à jour les données du graphique
-          // Mettre à jour les données du graphique
           const timeLabels = data.map(entry => entry.time); // Utiliser le format hh:mm:ss directement pour les labels
           const T_1 = data.map(entry => entry.T_1);
           const T_2 = data.map(entry => entry.T_2);
@@ -98,23 +97,18 @@ document.addEventListener('DOMContentLoaded', function() {
           const T_5 = data.map(entry => entry.T_5);
 
           // Mettre à jour les labels et les données du graphique
-          // Mettre à jour les labels et les données du graphique
-          temperatureChart.data.labels = entry.time; // Utilisez directement le format hh:mm:ss
+          temperatureChart.data.labels = timeLabels; // Mettre les labels au format hh:mm:ss
           temperatureChart.data.datasets[0].data = T_1;
           temperatureChart.data.datasets[1].data = T_2;
           temperatureChart.data.datasets[2].data = T_3;
           temperatureChart.data.datasets[3].data = T_4;
           temperatureChart.data.datasets[4].data = T_5;
 
-// Supprimez cette ligne car elle n'est plus nécessaire
-// temperatureChart.options.scales.x.min = timeLabels[0]; 
+          // Supprimez toute conversion des labels de l'axe x en secondes, car ils sont déjà dans le format souhaité
 
-  
-          // Ajuster l'axe des abscisses pour commencer au premier temps reçu
-          // temperatureChart.options.scales.x.min = timeLabels[0]; // Temps initial
-  
           // Rafraîchir le graphique
           temperatureChart.update();
+
         })
         .catch(error => console.error('Error fetching data:', error));
     }
