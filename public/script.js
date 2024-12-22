@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   
     // Appeler fetchData toutes les 4 secondes pour mettre à jour les données en direct
-    setInterval(fetchData, 5000);
+    setInterval(fetchData, 900000);
   
     // Bouton de téléchargement du fichier Excel
     document.getElementById('download-btn').addEventListener('click', () => {
