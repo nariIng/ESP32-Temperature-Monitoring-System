@@ -24,8 +24,8 @@ Ce projet vise à surveiller les variations de température à l'aide de 5 capte
 
 ### 2️⃣ Cloner le dépôt
 ```bash
-git clone https://github.com/votre-repo.git
-cd votre-repo
+git@github.com:nariIng/ESP32-Temperature-Monitoring-System.git
+cd ESP32-Temperature-Monitoring-System
 ```
 
 ### 3️⃣ Installer les dépendances
@@ -52,7 +52,7 @@ L'interface affiche 5 courbes correspondant à chaque capteur. Les données sont
 - [D3.js](https://d3js.org/)
 
 ## ✨ Auteurs & Contributeurs
-Projet développé par **[Votre Nom]**. Contributions bienvenues !
+Projet développé par **Narindranjanahary Emmanuela**. Contributions bienvenues !
 
 ## 📜 Licence
 Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
